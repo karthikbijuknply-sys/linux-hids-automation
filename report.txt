@@ -1,0 +1,16 @@
+====================================
+     LINUX THREAT HUNTER REPORT
+====================================
+Generated At: 2026-06-21 12:27:22
+Total Suspicious IPs: 2
+
+Attacker IP     : 192.168.1.50
+Failed Attempts : 3
+Risk Level      : LOW
+--------------------------------------------------
+Attacker IP     : 203.0.113.75
+Failed Attempts : 1
+Risk Level      : LOW
+--------------------------------------------------
+
+=== End of Report ===
