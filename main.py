@@ -111,16 +111,4 @@ def run_demonstration_engine(log_path):
                     generate_incident_report()
 
         except KeyboardInterrupt:
-            print("\n🛑 Security platform shutdown sequence initiated by root administrator.")
-
-def main():
-    print("=============================================================")
-    print("  Linux Detection Engine — Real-Time HIDS Platform Ingest    ")
-    print("=============================================================")
-    print("Initializing demonstration testing sequence...\n")
-    
-    target_log = "logs/auth.log"
-    run_demonstration_engine(target_log)
-
-if __name__ == "__main__":
-    main()
+            print("\n🛑 Security platform shutdown sequence initi
