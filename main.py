@@ -1,9 +1,13 @@
-# main.py - Simple HIDS with Continuous Monitoring
 import re
 import time
+import os
 from datetime import datetime
 
+# Global state tracking database for malicious authentication metrics
+ATTACK_TRACKER = {}
+
 def get_risk_level(count):
+    """Evaluates security posturing based on attack velocity thresholds."""
     if count >= 10:
         return "HIGH", "🚨"
     elif count >= 5:
@@ -12,6 +16,7 @@ def get_risk_level(count):
         return "LOW", "ℹ️"
 
 def print_alert(ip, count):
+    """Generates real-time, high-visibility console alert telemetry."""
     risk_level, emoji = get_risk_level(count)
     print("=" * 60)
     print(f"{emoji}  THREAT DETECTED  {emoji}")
@@ -23,17 +28,17 @@ def print_alert(ip, count):
     print("=" * 60)
     print()
 
-def reports(attempts):
-    """Save report to report.txt"""
+def generate_incident_report():
+    """Compiles attack data and flushes a forensic audit log to report.txt."""
     try:
         with open("report.txt", "w", encoding="utf-8") as f:
             f.write("====================================\n")
-            f.write("     LINUX THREAT HUNTER REPORT\n")
+            f.write("     LINUX DETECTION ENGINE REPORT\n")
             f.write("====================================\n")
             f.write(f"Generated At: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write(f"Total Suspicious IPs: {len(attempts)}\n\n")
+            f.write(f"Total Suspicious IPs Monitored: {len(ATTACK_TRACKER)}\n\n")
             
-            for ip, count in attempts.items():
+            for ip, count in ATTACK_TRACKER.items():
                 risk_level, _ = get_risk_level(count)
                 f.write(f"Attacker IP     : {ip}\n")
                 f.write(f"Failed Attempts : {count}\n")
@@ -41,50 +46,81 @@ def reports(attempts):
                 f.write("-" * 50 + "\n")
             
             f.write("\n=== End of Report ===\n")
-            print("✅ Report saved to report.txt")
+            print("💾 Forensic incident report successfully written to -> report.txt")
     except Exception as e:
-        print(f"❌ Could not save report: {e}")
-def analyze_logs():
-    """Analyze the log file once"""
-    try:
-        with open("logs/auth.log", "r", encoding="utf-8") as f:
-            lines = f.readlines()
+        print(f"❌ Critical Failure: Unable to write report.txt: {e}")
 
-        attempts = {}
+def parse_and_track_line(line, ip_regex):
+    """Inspects log entries via Regex and updates persistent security states."""
+    if "Failed password" in line:
+        match = ip_regex.search(line)
+        if match:
+            ip = match.group()
+            
+            # Increment tracking metrics per unique source IP address
+            ATTACK_TRACKER[ip] = ATTACK_TRACKER.get(ip, 0) + 1
+            
+            # Fire console security alert triggers
+            print_alert(ip, ATTACK_TRACKER[ip])
+            return True
+    return False
 
-        for line in lines:
-            line = line.strip()
-            if "Failed password" in line:
-                match = re.search(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", line)
-                if match:
-                    ip = match.group()
-                    attempts[ip] = attempts.get(ip, 0) + 1
+def run_demonstration_engine(log_path):
+    """Executes baseline ingestion of fake demo logs, then transitions to live tracking."""
+    print(f"🎯 Target Log Collector Bound To: {log_path}\n")
+    
+    if not os.path.exists(log_path):
+        print(f"❌ Error: Target file '{log_path}' missing. Please verify directory nesting.")
+        return
 
-        return attempts
+    # Compile optimized Regex pattern matching schema for IPv4 extraction
+    ip_regex = re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
 
-    except Exception as e:
-        print(f"Error reading log: {e}")
-        return {}
+    # Phase 1: Ingest and process existing simulated logs for demonstration validation
+    print("🚀 PHASE 1: Executing Simulated Log Demonstration Ingestion...")
+    print("-" * 60)
+    
+    new_data_found = False
+    with open(log_path, "r", encoding="utf-8") as f:
+        for line in f:
+            if parse_and_track_line(line, ip_regex):
+                new_data_found = True
+        
+        # Compile and generate report.txt immediately following baseline scan
+        if new_data_found:
+            generate_incident_report()
+        else:
+            print("ℹ️ Demonstration notice: logs/auth.log contained no brute-force failure strings.")
+
+        print("-" * 60)
+        print("🟢 PHASE 2: Transitioning to Persistent Active Monitoring.")
+        print("Listening for incoming host anomalies... Press Ctrl+C to stop.")
+
+        # Phase 2: Live tail streaming simulation loop monitoring for added lines
+        try:
+            while True:
+                line = f.readline()
+                
+                # If no new line is generated, rest thread to protect host processing resources
+                if not line:
+                    time.sleep(1)
+                    continue
+
+                # Process newly appended line telemetry and rewrite report.txt state
+                if parse_and_track_line(line, ip_regex):
+                    generate_incident_report()
+
+        except KeyboardInterrupt:
+            print("\n🛑 Security platform shutdown sequence initiated by root administrator.")
 
 def main():
-    print("=== Simple HIDS Continuous Monitoring Started ===\n")
-    print("Press Ctrl + C to stop monitoring\n")
-
-    while True:   # This creates the continuous loop
-        print(f"\n🔄 Checking logs at {datetime.now().strftime('%H:%M:%S')}...")
-
-        attempts = analyze_logs()
-
-        if attempts:
-            print("🔊 GENERATING ALERTS...\n")
-            for ip, count in attempts.items():
-                print_alert(ip, count)
-            reports(attempts)     
-        else:
-            print("✅ No suspicious activity detected.")
-
-        print(f"Next check in 30 seconds... (Press Ctrl+C to stop)")
-        time.sleep(30)   # Wait 30 seconds before next check
+    print("=============================================================")
+    print("  Linux Detection Engine — Real-Time HIDS Platform Ingest    ")
+    print("=============================================================")
+    print("Initializing demonstration testing sequence...\n")
+    
+    target_log = "logs/auth.log"
+    run_demonstration_engine(target_log)
 
 if __name__ == "__main__":
     main()
