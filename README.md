@@ -82,12 +82,12 @@ Linux Authentication Logs
 
 ```text
 ============================================================
-🚨 THREAT DETECTED
+🚨  THREAT DETECTED  🚨
 ============================================================
-IP Address     : 192.168.1.50
-Failed Attempts: 8
-Risk Level     : MEDIUM
-Time           : 2026-06-21 14:35:21
+IP Address     : 185.220.101.4
+Failed Attempts: 12
+Risk Level     : HIGH
+Time           : 2026-06-21 14:05:32
 ============================================================
 ```
 
