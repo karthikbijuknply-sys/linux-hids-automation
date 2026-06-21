@@ -37,14 +37,14 @@ def generate_incident_report():
             f.write("====================================\n")
             f.write(f"Generated At: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write(f"Total Suspicious IPs Monitored: {len(ATTACK_TRACKER)}\n\n")
-            
+
             for ip, count in ATTACK_TRACKER.items():
                 risk_level, _ = get_risk_level(count)
                 f.write(f"Attacker IP     : {ip}\n")
                 f.write(f"Failed Attempts : {count}\n")
                 f.write(f"Risk Level      : {risk_level}\n")
                 f.write("-" * 50 + "\n")
-            
+
             f.write("\n=== End of Report ===\n")
             print("💾 Forensic incident report successfully written to -> report.txt")
     except Exception as e:
@@ -56,10 +56,10 @@ def parse_and_track_line(line, ip_regex):
         match = ip_regex.search(line)
         if match:
             ip = match.group()
-            
+
             # Increment tracking metrics per unique source IP address
             ATTACK_TRACKER[ip] = ATTACK_TRACKER.get(ip, 0) + 1
-            
+
             # Fire console security alert triggers
             print_alert(ip, ATTACK_TRACKER[ip])
             return True
@@ -68,7 +68,7 @@ def parse_and_track_line(line, ip_regex):
 def run_demonstration_engine(log_path):
     """Executes baseline ingestion of fake demo logs, then transitions to live tracking."""
     print(f"🎯 Target Log Collector Bound To: {log_path}\n")
-    
+
     if not os.path.exists(log_path):
         print(f"❌ Error: Target file '{log_path}' missing. Please verify directory nesting.")
         return
@@ -79,13 +79,13 @@ def run_demonstration_engine(log_path):
     # Phase 1: Ingest and process existing simulated logs for demonstration validation
     print("🚀 PHASE 1: Executing Simulated Log Demonstration Ingestion...")
     print("-" * 60)
-    
+
     new_data_found = False
     with open(log_path, "r", encoding="utf-8") as f:
         for line in f:
             if parse_and_track_line(line, ip_regex):
                 new_data_found = True
-        
+
         # Compile and generate report.txt immediately following baseline scan
         if new_data_found:
             generate_incident_report()
@@ -100,7 +100,7 @@ def run_demonstration_engine(log_path):
         try:
             while True:
                 line = f.readline()
-                
+
                 # If no new line is generated, rest thread to protect host processing resources
                 if not line:
                     time.sleep(1)
@@ -111,4 +111,16 @@ def run_demonstration_engine(log_path):
                     generate_incident_report()
 
         except KeyboardInterrupt:
-            print("\n🛑 Security platform shutdown sequence initi
+            print("\n🛑 Security platform shutdown sequence initiated by root administrator.")
+
+def main():
+    print("=============================================================")
+    print("  Linux Detection Engine — Real-Time HIDS Platform Ingest    ")
+    print("=============================================================")
+    print("Initializing demonstration testing sequence...\n")
+
+    target_log = "logs/auth.log"
+    run_demonstration_engine(target_log)
+
+if __name__ == "__main__":
+    main()
